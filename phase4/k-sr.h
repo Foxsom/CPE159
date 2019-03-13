@@ -3,7 +3,6 @@
 #ifndef __K_SR__
 #define __K_SR__
 
-//#include "k-sr.c"
 
 void TermSR(int term_no);       //<---------------Phase 4
 void NewProcSR(func_p_t p);
@@ -16,4 +15,9 @@ void CheckWakeProc(void);
 void ShowCharSR(int row, int col, char ch);
 int MuxCreateSR(int flag);
 void MuxOpSR(int mux_id, int opcode);
+
+//Phase 4
+void TermTxSR(int term_no);
+void TermRxSR(int term_no);
+
 #endif

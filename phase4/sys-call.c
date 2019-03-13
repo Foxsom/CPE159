@@ -5,6 +5,7 @@
 #include "k-type.h"
 #include "k-sr.h"
 #include "k-data.h"
+#include "k-lib.h"
 int GetPidCall(void) {
    int pid;
 
@@ -85,6 +86,7 @@ void WriteCall(int device, char *str){
      if (device==TERM0_INTR) asm("int $35");
      else asm("int $36");
      str++;
+     MuxOpCall(term[term_no].out_mux, UNLOCK);           //Not in coding hints but I think it belongs
      }
    }
 

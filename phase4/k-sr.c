@@ -5,6 +5,7 @@
 #include "k-data.h"
 #include "k-lib.h"
 #include "k-sr.h"
+#include "sys-call.h"
 
 // to create a process: alloc PID, PCB, and process stack
 // build trapframe, initialize PCB, record PID to ready_q
@@ -163,12 +164,12 @@ void TermSR(int term_no) {
     char c; 
     //if the out_q in terminal interface data structure is empty:
          //if (QisEmpty(&(term[term_no]))) {
-			     if (QisEmpty(IIR)) {
+			     if (QisEmpty(&term[term_no].out_q)) {
            term[term_no].tx_missed = TRUE;	//1. set the tx_missed flag to TRUE
 			      return;							//2. return
 		 } else { 							//(otherwise)
 			    //c = DeQ(&term[term_no]);										//1. get 1st char from out_q
-			    c = DeQ(IIR);
+			    c = DeQ(&term[term_no].out_q);
           outportb(DATA,c);//2. use outportb() to send it to the DATA register of the terminal port 
 			    term[term_no].tx_missed = FALSE;//3. set the tx_missed flag to FALSE
     			MuxOpCall(term[term_no].out_mux,UNLOCK);								//4. unlock the out_mux of the terminal interface data structure
