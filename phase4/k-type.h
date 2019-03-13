@@ -34,5 +34,14 @@ typedef struct {
   q_t suspend_q;
   
 } mux_t;
+
+//Phase 4
+typedef struct {
+  int tx_missed;
+  int io_base;
+  int out_mux;
+  q_t out_q;
+} term_t;
+
 #endif
  

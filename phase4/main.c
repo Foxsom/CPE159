@@ -1,8 +1,7 @@
 // main.c, 159
 // OS phase 1
 //
-// Team Name: gdb4life (Members: Tyler Fox, Zachary Derheim)
-
+// Team Name: gdb4life (Members: Tyler Fox, Zachary Derheim, Jesse Root)
 #include "k-include.h"  // SPEDE includes
 #include "k-entry.h"    // entries to kernel (TimerEntry, etc.)
 #include "k-type.h"     // kernel data types
@@ -18,6 +17,12 @@ mux_t mux[MUX_SIZE];
 pcb_t pcb[PROC_SIZE];               // Process Control Blocks
 char proc_stack[PROC_SIZE][PROC_STACK_SIZE];   // process runtime stacks
 struct i386_gate *intr_table;    // intr table's DRAM location
+
+
+term_t term[TERM_SIZE] = {
+{TRUE, TERM0_IO_BASE},
+{TRUE, TERM1_IO_BASE}
+};
 
 void InitKernelData(void) {         // init kernel data
    int i;
@@ -45,6 +50,11 @@ void InitKernelControl(void) {      // init kernel control
    fill_gate(&intr_table[SHOWCHAR_CALL],(int)ShowCharEntry, get_cs(), ACC_INTR_GATE, 0 );
    fill_gate(&intr_table[MUX_CREATE_CALL],(int)MuxCreateEntry, get_cs(), ACC_INTR_GATE, 0 );
 fill_gate(&intr_table[MUX_OP_CALL],(int)MuxOpEntry, get_cs(), ACC_INTR_GATE, 0 );
+
+//Phase 4
+fill_gate(&intr_table[TERM0_INTR],(int)Term0Entry, get_cs(), ACC_INTR_GATE, 0 );
+fill_gate(&intr_table[TERM1_INTR],(int)Term1Entry, get_cs(), ACC_INTR_GATE, 0 );
+
    outportb(PIC_MASK, MASK);               // mask out PIC for timer
   // cons_printf("InitKernelControl: Complete\n");
 }
@@ -105,13 +115,21 @@ void Kernel(trapframe_t *trapframe_p) {           // kernel runs
       TimerSR();
       break;
     case MUX_CREATE_CALL:
-      trapframe_p->eax = MuxCreateSR(1);
+      trapframe_p->eax = MuxCreateSR(trapframe_p->eax);
       break;
     case MUX_OP_CALL:
       MuxOpSR(trapframe_p->eax, trapframe_p->ebx);
       break;
     case SHOWCHAR_CALL:
       ShowCharSR(trapframe_p->eax, trapframe_p->ebx, trapframe_p->ecx);
+      break;
+    case TERM0_INTR:
+      TermSR(0);
+      outportb(PIC_CONTROL, TERM0_DONE);
+      break;
+    case TERM1_INTR:
+      TermSR(1);
+      outportb(PIC_CONTROL, TERM1_DONE);
       break;
   }
 

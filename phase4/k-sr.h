@@ -5,6 +5,7 @@
 
 //#include "k-sr.c"
 
+void TermSR(int term_no);       //<---------------Phase 4
 void NewProcSR(func_p_t p);
 void TimerSR(void);
 int GetPidSR(void);

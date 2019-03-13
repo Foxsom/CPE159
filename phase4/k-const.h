@@ -6,7 +6,7 @@
 #define NONE -1             // used when none
 #define TIMER_INTR 32       // TIMER INTR constant identifier
 #define PIC_MASK 0x21       // Programmable Interrupt Controller I/O
-#define MASK ~0x01          // mask for Programmable Interrupt Controller
+#define MASK 0xffffffe6          // mask for Programmable Interrupt Controller
 #define PIC_CONTROL 0x20    // Programmable Interrupt Controller I/O
 #define TIMER_DONE 0x60     // sent to PIC when timer service done
 
@@ -32,5 +32,18 @@
 #define LOCK 1
 #define UNLOCK 2
 #define STDOUT 1
+
+//Phase 4 items
+#define TERM_SIZE 2
+#define TERM0_INTR 35
+#define TERM1_INTR 36
+#define TERM0_IO_BASE 0x2f8
+#define TERM1_IO_BASE 0x3e8
+#define TERM0_DONE 0x63
+#define TERM1_DONE 0x64
+#define TXRDY 2
+#define RXRDY 4
+#define TRUE 1
+#define FALSE 0
 
 #endif

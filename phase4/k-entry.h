@@ -17,6 +17,8 @@ void ShowCharEntry(void);
 void SleepEntry(void);
 void MuxCreateEntry(void);
 void MuxOpEntry(void);
+void Term0Entry(void);
+void Term1Entry(void);
 __END_DECLS
 
 #endif // ifndef ASSEMBLER

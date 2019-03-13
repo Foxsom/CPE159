@@ -16,4 +16,7 @@ extern int sys_centi_sec, run_pid, vid_mux;
 
 //Phase 3
 extern int vid_mux;
+
+//Phase 4
+extern term_t term[TERM_SIZE];
 #endif                         // endif of ifndef

@@ -4,7 +4,7 @@
 #include "k-const.h"
 #include "k-type.h"
 #include "k-sr.h"
-
+#include "k-data.h"
 int GetPidCall(void) {
    int pid;
 
@@ -62,8 +62,8 @@ void MuxOpCall(int mux_id, int opcode){
 }
 
 void WriteCall(int device, char *str){
- int row, col;
-
+ int row, col, term_no;
+ 
  row = GetPidCall();
  col = 0;
 
@@ -74,5 +74,19 @@ void WriteCall(int device, char *str){
      str++;
    }
  }
+ else{
+   
+   if(device==TERM0_INTR) term_no = 0;
+   else if(device==TERM1_INTR) term_no = 1;
+   term[term_no].out_mux = MuxCreateCall(1);             //May need to be moved and flag may be wrong
+   while(*str != '\0'){
+     MuxOpCall(term[term_no].out_mux, LOCK);
+     EnQ(*str, &term[term_no].out_q);
+     if (device==TERM0_INTR) asm("int $35");
+     else asm("int $36");
+     str++;
+     MuxOpCall(term[term_no].out_mux, UNLOCK);           //Not in coding hints but I think it belongs
+     }
+   }
 
 }
