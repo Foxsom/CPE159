@@ -105,6 +105,7 @@ void Kernel(trapframe_t *trapframe_p) {           // kernel runs
   
   //printf("Entry ID is %d\n", trapframe_p->entry_id);
    //TimerSR();                     // handle timer intr
+   //printf("entry_id = %d\n",trapframe_p->entry_id);
   switch(trapframe_p->entry_id){
     case SLEEP_CALL:
       SleepSR(trapframe_p->eax);

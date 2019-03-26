@@ -64,7 +64,7 @@ void MuxOpCall(int mux_id, int opcode){
 
 void WriteCall(int device, char *str){
  int row, col, term_no;
- printf("Write call started for device %d\n", device);
+ //printf("Write call started for device %d\n", device);
  row = GetPidCall();
  col = 0;
  
@@ -79,18 +79,18 @@ void WriteCall(int device, char *str){
    
    if(device==TERM0_INTR) term_no = 0;
    else term_no = 1;
-
+   //printf("WriteCall Term Number is %d\n", term_no);
    while(*str != '\0'){
      MuxOpCall(term[term_no].out_mux, LOCK);
-//     printf("Locked Mux\n");
+    // printf("Locked Mux\n");
      EnQ(*str, &term[term_no].out_q);
-     printf("Queued: %c\n", *str);
+     //printf("Queued: %c\n", *str);
      if (device==TERM0_INTR) {
-       printf("Sending TERM0_INTR\n");
+       //printf("Sending TERM0_INTR\n");
        asm("int $35");
      }
      else {
-       printf("Sending TERM1_INTR\n");
+       //printf("Sending TERM1_INTR\n");
        asm("int $36");
      }
   //   printf("Interrupt Sent\n");

@@ -12,6 +12,7 @@ void InitTerm(int term_no){
   int i, j;
 
   Bzero((char *)&term[term_no].out_q, sizeof(q_t));
+  //printf("Creating term Mux\n");
   term[term_no].out_mux = MuxCreateCall(Q_SIZE);
 
   outportb(term[term_no].io_base+CFCR, CFCR_DLAB);
@@ -21,32 +22,36 @@ void InitTerm(int term_no){
 
   outportb(term[term_no].io_base+IER, 0);
   outportb(term[term_no].io_base+MCR, MCR_DTR|MCR_RTS|MCR_IENABLE);
-
+  //printf("outports completed\n");
   for(i=0; i<LOOP/2; i++) asm("inb $0x80");
-
-  outportb(term[term_no].io_base+IER, IER_ERXRDY|IER_ETXRDY);
+  //printf("First loop done\n");
+  //outportb(term[term_no].io_base+IER, IER_ERXRDY|IER_ETXRDY);
+  outportb(term[term_no].io_base+IER, IER_ETXRDY);
+  //printf("TXRDY and RXRDY sent\n");
   for(i=0; i<LOOP/2; i++) asm("inb $0x80");
-
-
+ 
+  //printf("Clearing screen\n");
   for(j=0; j<25; j++){
     outportb(term[term_no].io_base+DATA, '\n');
     for(i=0; i<LOOP/30; i++) asm("inb $0x80");
     outportb(term[term_no].io_base+DATA, '\r');
     for(i=0; i<LOOP/30; i++) asm("inb $0x80");
   }
-  
+  //printf("Running first inport\n");
   inportb(term[term_no].io_base);
   for(i=0; i<LOOP/2; i++) asm("inb $0x80");
 }
 
 void InitProc(void) {
    int i;
+   //printf("Creating vid mux\n");
    vid_mux = MuxCreateCall(1);
    
    
 
    InitTerm(0);
    InitTerm(1);
+   printf("Done initializing\n");
    while(1) {
       ShowCharCall(0, 0, '.');
       for(i=0; i<LOOP/2; i++) asm("inb $0x80");   // this is also a kernel service
@@ -63,8 +68,8 @@ void UserProc(void) {
    char str1[STR_SIZE] = "PID    process is running exclusively using the video display...";
    char str2[STR_SIZE] = "                                                                ";
    
-   int which_term = my_pid%2==1? TERM0_INTR : TERM0_INTR;
-   printf("PID %d interrupt is %d\n", my_pid, which_term);
+   int which_term = my_pid%2==1? TERM0_INTR : TERM1_INTR;
+   //printf("PID %d interrupt is %d\n", my_pid, which_term);
   // if(my_pid%2==1) which_term = TERM0_INTR;
   // else which_term = TERM1_INTR;
    str1[4] = '0' + my_pid/10;
