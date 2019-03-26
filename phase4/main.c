@@ -49,11 +49,11 @@ void InitKernelControl(void) {      // init kernel control
    fill_gate(&intr_table[SLEEP_CALL],(int)SleepEntry, get_cs(), ACC_INTR_GATE, 0 );
    fill_gate(&intr_table[SHOWCHAR_CALL],(int)ShowCharEntry, get_cs(), ACC_INTR_GATE, 0 );
    fill_gate(&intr_table[MUX_CREATE_CALL],(int)MuxCreateEntry, get_cs(), ACC_INTR_GATE, 0 );
-fill_gate(&intr_table[MUX_OP_CALL],(int)MuxOpEntry, get_cs(), ACC_INTR_GATE, 0 );
+  fill_gate(&intr_table[MUX_OP_CALL],(int)MuxOpEntry, get_cs(), ACC_INTR_GATE, 0 );
 
 //Phase 4
-fill_gate(&intr_table[TERM0_INTR],(int)Term0Entry, get_cs(), ACC_INTR_GATE, 0 );
-fill_gate(&intr_table[TERM1_INTR],(int)Term1Entry, get_cs(), ACC_INTR_GATE, 0 );
+  fill_gate(&intr_table[TERM0_INTR],(int)Term0Entry, get_cs(), ACC_INTR_GATE, 0 );
+  fill_gate(&intr_table[TERM1_INTR],(int)Term1Entry, get_cs(), ACC_INTR_GATE, 0 );
 
    outportb(PIC_MASK, MASK);               // mask out PIC for timer
   // cons_printf("InitKernelControl: Complete\n");
@@ -102,7 +102,8 @@ void Kernel(trapframe_t *trapframe_p) {           // kernel runs
    char ch;
 
    pcb[run_pid].trapframe_p = trapframe_p; // save it
-
+  
+  //printf("Entry ID is %d\n", trapframe_p->entry_id);
    //TimerSR();                     // handle timer intr
   switch(trapframe_p->entry_id){
     case SLEEP_CALL:
@@ -115,7 +116,7 @@ void Kernel(trapframe_t *trapframe_p) {           // kernel runs
       TimerSR();
       break;
     case MUX_CREATE_CALL:
-      trapframe_p->eax = MuxCreateSR(trapframe_p->eax);
+      trapframe_p->eax = MuxCreateSR(1);
       break;
     case MUX_OP_CALL:
       MuxOpSR(trapframe_p->eax, trapframe_p->ebx);
@@ -124,11 +125,14 @@ void Kernel(trapframe_t *trapframe_p) {           // kernel runs
       ShowCharSR(trapframe_p->eax, trapframe_p->ebx, trapframe_p->ecx);
       break;
     case TERM0_INTR:
+      //printf("Starting TERM0 Case\n");
       TermSR(0);
+      //printf("TermSR(0) done\n");
       outportb(PIC_CONTROL, TERM0_DONE);
       break;
     case TERM1_INTR:
-      TermSR(1);
+      //printf("Starting TERM1 Case\n");
+      TermSR(1);      
       outportb(PIC_CONTROL, TERM1_DONE);
       break;
   }

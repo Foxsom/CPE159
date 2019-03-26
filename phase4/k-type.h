@@ -10,7 +10,7 @@ typedef void (*func_p_t)(void); // void-return function pointer type
 typedef enum {UNUSED, READY, RUN, SLEEP, SUSPEND} state_t;
 
 typedef struct {
-//   unsigned int reg[8];
+//unsigned int reg[8];
    unsigned int edi, esi, ebp, esp, ebx, 
    edx, ecx, eax, entry_id, eip, cs, efl;
 } trapframe_t;

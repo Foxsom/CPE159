@@ -42,6 +42,8 @@ void InitTerm(int term_no){
 void InitProc(void) {
    int i;
    vid_mux = MuxCreateCall(1);
+   
+   
 
    InitTerm(0);
    InitTerm(1);
@@ -56,27 +58,32 @@ void InitProc(void) {
 }
 
 void UserProc(void) {
-   
+//   int which_term;
    int my_pid = GetPidCall();
    char str1[STR_SIZE] = "PID    process is running exclusively using the video display...";
    char str2[STR_SIZE] = "                                                                ";
+   
    int which_term = my_pid%2==1? TERM0_INTR : TERM0_INTR;
+   printf("PID %d interrupt is %d\n", my_pid, which_term);
+  // if(my_pid%2==1) which_term = TERM0_INTR;
+  // else which_term = TERM1_INTR;
    str1[4] = '0' + my_pid/10;
    str1[5] = '0' + my_pid%10;
-    
    
    while(1) {
 
       MuxOpCall(vid_mux, LOCK);
       
       
-
+//      printf("writing to STDOUT %d\n", STDOUT);
       WriteCall(STDOUT, str1);  // show my PID
+ //     printf("wrinting to term %d\n", which_term);
       WriteCall(which_term, str1);
       WriteCall(which_term, "\n\r");
       SleepCall(50);
 
                      // erasure
+ //     printf("Erasing text from display\n");
       WriteCall(STDOUT, str2);
       SleepCall(50);
       MuxOpCall(vid_mux, UNLOCK);

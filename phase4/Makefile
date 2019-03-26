@@ -331,7 +331,7 @@ $(MY_DLI) :	$(OBJECTS) Makefile
 #  Dependencies.
 #### YQYQYQ-MARK-2 ####
 #
-#  Dependencies generated Tue Mar 12 20:57:39 PDT 2019 by (spede-mkmf $Revision: 1.2 $/1)
+#  Dependencies generated Tue Mar 12 23:47:50 PDT 2019 by (spede-mkmf $Revision: 1.2 $/1)
 #
 
 k-entry.o: k-entry.S k-const.h \
@@ -366,7 +366,7 @@ k-sr.o: k-sr.c k-include.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/seg.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/asmacros.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/rs232.h \
- k-type.h k-const.h k-data.h k-lib.h k-sr.h
+ k-type.h k-const.h k-data.h k-lib.h k-sr.h sys-call.h
 main.o: main.c k-include.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/stdio.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/sys/cdefs.h \
@@ -398,7 +398,7 @@ proc.o: proc.c k-const.h sys-call.h k-data.h k-type.h k-lib.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/seg.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/asmacros.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/rs232.h
-sys-call.o: sys-call.c k-const.h k-type.h k-sr.h k-data.h
+sys-call.o: sys-call.c k-const.h k-type.h k-sr.h k-data.h k-lib.h
 
 #### YQYQYQ-STOP-2 ####
 

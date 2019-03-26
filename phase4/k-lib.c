@@ -50,7 +50,7 @@ int DeQ(q_t *p) { // return -1 if q[] is empty
 
 // if not full, enqueue # to tail slot in queue
 void EnQ(int to_add, q_t* p) {
- // printf("Queuing %d\n", to_add);
+  //printf("Queuing %d\n", to_add);
    if(QisFull(p)) {
       cons_printf("Panic: queue is full, cannot EnQ!\n");
       return;

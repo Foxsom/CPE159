@@ -64,10 +64,10 @@ void MuxOpCall(int mux_id, int opcode){
 
 void WriteCall(int device, char *str){
  int row, col, term_no;
- 
+ printf("Write call started for device %d\n", device);
  row = GetPidCall();
  col = 0;
-
+ 
  if(device == STDOUT){
    while(*str != '\0'){
      ShowCharCall(row, col, *str);
@@ -78,15 +78,23 @@ void WriteCall(int device, char *str){
  else{
    
    if(device==TERM0_INTR) term_no = 0;
-   else if(device==TERM1_INTR) term_no = 1;
-   term[term_no].out_mux = MuxCreateCall(1);             //May need to be moved and flag may be wrong
+   else term_no = 1;
+
    while(*str != '\0'){
      MuxOpCall(term[term_no].out_mux, LOCK);
+//     printf("Locked Mux\n");
      EnQ(*str, &term[term_no].out_q);
-     if (device==TERM0_INTR) asm("int $35");
-     else asm("int $36");
+     printf("Queued: %c\n", *str);
+     if (device==TERM0_INTR) {
+       printf("Sending TERM0_INTR\n");
+       asm("int $35");
+     }
+     else {
+       printf("Sending TERM1_INTR\n");
+       asm("int $36");
+     }
+  //   printf("Interrupt Sent\n");
      str++;
-     MuxOpCall(term[term_no].out_mux, UNLOCK);           //Not in coding hints but I think it belongs
      }
    }
 
