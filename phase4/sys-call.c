@@ -6,6 +6,7 @@
 #include "k-sr.h"
 #include "k-data.h"
 #include "k-lib.h"
+
 int GetPidCall(void) {
    int pid;
 
@@ -64,38 +65,33 @@ void MuxOpCall(int mux_id, int opcode){
 
 void WriteCall(int device, char *str){
  int row, col, term_no;
- //printf("Write call started for device %d\n", device);
+
  row = GetPidCall();
  col = 0;
- 
+
  if(device == STDOUT){
    while(*str != '\0'){
      ShowCharCall(row, col, *str);
      col++;
      str++;
    }
- }
- else{
-   
-   if(device==TERM0_INTR) term_no = 0;
-   else term_no = 1;
-   //printf("WriteCall Term Number is %d\n", term_no);
-   while(*str != '\0'){
-     MuxOpCall(term[term_no].out_mux, LOCK);
-    // printf("Locked Mux\n");
-     EnQ(*str, &term[term_no].out_q);
-     //printf("Queued: %c\n", *str);
-     if (device==TERM0_INTR) {
-       //printf("Sending TERM0_INTR\n");
-       asm("int $35");
-     }
-     else {
-       //printf("Sending TERM1_INTR\n");
-       asm("int $36");
-     }
-  //   printf("Interrupt Sent\n");
-     str++;
-     }
+ } else {
+      if(device == TERM0_INTR) term_no = 0;
+      else term_no = 1;
+      while(*str != '\0'){
+          MuxOpCall(term[term_no].out_mux, LOCK);
+
+          EnQ(*str, &term[term_no].out_q);
+
+          if (device ==TERM0_INTR) {
+              printf("Sending TERM0_INTR\n");
+              asm("int $35");
+            } else {
+                 printf("Sending TERM1_INTR\n");
+                 asm("int $36");
+              }
+          str++;    
+        }
    }
 
 }
