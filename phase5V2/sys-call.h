@@ -14,4 +14,5 @@ extern void SleepCall(int centi_sec);
 extern int MuxCreateCall(int flag);
 extern void MuxOpCall(int mux_id, int opcode);
 extern void WriteCall(int device, char *str);
+extern void ReadCall(int device, char *str);
 #endif

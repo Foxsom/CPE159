@@ -42,6 +42,7 @@ void SleepCall(int centi_sec) {  // # of 1/100 of a second to sleep
 //Phase 3
 int MuxCreateCall(int flag){
   int muxID;
+  //printf("MuxCreateCall flag = %d\n");
   asm("movl %1, %%eax;
       int %2;
       movl %%eax, %0"
@@ -101,23 +102,31 @@ void WriteCall(int device, char *str){
 }
 
 void ReadCall (int device, char *str) {
-    int term_no;
+    int term_no, charCount;
+    char c;
 
     if(device==TERM0_INTR) term_no = 0;
     else term_no =1;
+    
+    charCount = 0;
 
     while(1) {
-        MuxOpCall(term[term_no].in_mux, LOCK);   
-        DeQ(&term[term_no].in_q);
-        //need to set where strpoints to char
-       // if() {
-       //     return;
-       //   }
-        // advance str pointer & char count
-       // if () {
-            //set where str points to in NUL
-       //     return;
-       //   }
+        MuxOpCall(term[term_no].in_mux, LOCK);
+	//printf("Attempting to deQ a char\n");   
+        c = DeQ(&term[term_no].in_q);
+        *str = c;
+
+        if(c=='\0') {
+            return;
+          }
+
+        str++;
+	charCount++;
+
+        if (charCount==STR_SIZE) {
+            *str = '\0';
+            return;
+          }
       
     }
   }
