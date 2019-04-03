@@ -7,7 +7,7 @@
 #include "k-data.h"
 #include "k-lib.h"
 #include "k-include.h"
-//term_t term[TERM_SIZE] = {{TRUE, TERM0_IO_BASE}, {TRUE, TERM1_IO_BASE}};
+
 void InitTerm(int term_no){
   int i, j;
 
@@ -18,6 +18,8 @@ void InitTerm(int term_no){
   //printf("Creating term Mux\n");
   term[term_no].out_mux = MuxCreateCall(Q_SIZE);
   term[term_no].in_mux = MuxCreateCall(0);
+  
+//printf("Term_no %d out_mux = %d, in_mux = %d\n", term_no, term[term_no].out_mux, term[term_no].in_mux);
 
   outportb(term[term_no].io_base+CFCR, CFCR_DLAB);
   outportb(term[term_no].io_base+BAUDLO, LOBYTE(115200/9600));
@@ -67,12 +69,14 @@ void InitProc(void) {
 }
 
 void UserProc(void) {
+//   int which_term;
    int my_pid = GetPidCall();
-
+   //char str1[STR_SIZE] = "PID    process is running exclusively using the video display...";
+   //char str2[STR_SIZE] = "                                                                ";
    char str1[STR_SIZE] = "PID    > ";
    char str2[STR_SIZE];
-   
-   int device = my_pid%2==1? TERM0_INTR : TERM1_INTR;
+
+   int which_term = my_pid%2==1? TERM0_INTR : TERM1_INTR;
    //printf("PID %d interrupt is %d\n", my_pid, which_term);
   // if(my_pid%2==1) which_term = TERM0_INTR;
   // else which_term = TERM1_INTR;
@@ -83,21 +87,23 @@ void UserProc(void) {
 
       //MuxOpCall(vid_mux, LOCK);
       
-      
+      /*
 //      printf("writing to STDOUT %d\n", STDOUT);
-      //WriteCall(STDOUT, str1);  // show my PID
+      WriteCall(STDOUT, str1);  // show my PID
  //     printf("wrinting to term %d\n", which_term);
-      printf("write to term %d\n", device);
-      WriteCall(device, str1);
-      ReadCall(device, str2);
-      WriteCall(STDOUT, str2);
-      //SleepCall(50);
+      WriteCall(which_term, str1);
+      WriteCall(which_term, "\n\r");
+      SleepCall(50);
 
                      // erasure
  //     printf("Erasing text from display\n");
-      //WriteCall(STDOUT, str2);
-      //SleepCall(50);
-      //MuxOpCall(vid_mux, UNLOCK);
+      WriteCall(STDOUT, str2);
+      SleepCall(50);
+      MuxOpCall(vid_mux, UNLOCK);
+	*/
+	WriteCall(which_term, str1);
+	ReadCall(which_term, str2);
+	WriteCall(STDOUT, str2);
    }
 }
 

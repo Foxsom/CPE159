@@ -42,6 +42,7 @@ void SleepCall(int centi_sec) {  // # of 1/100 of a second to sleep
 //Phase 3
 int MuxCreateCall(int flag){
   int muxID;
+  //printf("MuxCreateCall flag = %d\n");
   asm("movl %1, %%eax;
       int %2;
       movl %%eax, %0"
@@ -79,19 +80,18 @@ void WriteCall(int device, char *str){
    
    if(device==TERM0_INTR) term_no = 0;
    else term_no = 1;
-
-   printf("WriteCall Term Number is %d\n", term_no);
+   //printf("WriteCall Term Number is %d\n", term_no);
    while(*str != '\0'){
      MuxOpCall(term[term_no].out_mux, LOCK);
     // printf("Locked Mux\n");
      EnQ(*str, &term[term_no].out_q);
-     printf("Queued: %c\n", *str);
+     //printf("Queued: %c\n", *str);
      if (device==TERM0_INTR) {
-       printf("Sending TERM0_INTR\n");
+       //printf("Sending TERM0_INTR\n");
        asm("int $35");
      }
      else {
-       printf("Sending TERM1_INTR\n");
+       //printf("Sending TERM1_INTR\n");
        asm("int $36");
      }
   //   printf("Interrupt Sent\n");
@@ -104,22 +104,27 @@ void WriteCall(int device, char *str){
 void ReadCall (int device, char *str) {
     int term_no, charCount;
     char c;
-    charCount = 0;
 
     if(device==TERM0_INTR) term_no = 0;
     else term_no =1;
+    
+    charCount = 0;
 
     while(1) {
-        MuxOpCall(term[term_no].in_mux, LOCK);   
+        MuxOpCall(term[term_no].in_mux, LOCK);
+	//printf("Attempting to deQ a char\n");   
         c = DeQ(&term[term_no].in_q);
-        *str = c; //need to set where strpoints to char
-        if(c == '\0') {
+        *str = c;
+
+        if(c=='\0') {
             return;
           }
-        str++; // advance str pointer & char count
-        charCount++;
-        if (charCount == STR_SIZE) {
-            *str = '\0'; //set where str points to in NUL
+
+        str++;
+	charCount++;
+
+        if (charCount==STR_SIZE) {
+            *str = '\0';
             return;
           }
       

@@ -111,9 +111,10 @@ int MuxCreateSR(int flag){
 
 void MuxOpSR(int mux_id, int opcode){
    if(opcode==LOCK){
+	//printf("Attempting Lock, flag = %d\n", mux[mux_id].flag);
       if(mux[mux_id].flag>0) {
       mux[mux_id].flag--;
-     // printf("Mux %d locked, value is %d\n", mux_id, mux[mux_id].flag);
+      //printf("Mux %d locked, value is %d\n", mux_id, mux[mux_id].flag);
       
       }
       else{
@@ -149,14 +150,13 @@ void MuxOpSR(int mux_id, int opcode){
 void TermSR(int term_no) {
         int x = inportb(term[term_no].io_base+IIR);
        
-      printf("Start of TermSR term_no = %d; IIR = %d\n", term_no, x);
+      //printf("Start of TermSR term_no = %d; IIR = %d\n", term_no, x);
   //    printf("IIR options TXRDY = %d, RXRDY = %d\n", TXRDY, RXRDY);
       //read the type of event from IIR of the terminal port
       //(IIR is Interrupt Indicator Register)
 	      if(x == TXRDY){
           //printf("Moving into TermTxSR\n");
-          TermTxSR(term_no);
-	     //it's RXRDY, call TermRxSR(term_no) which does nothing but 'return;'
+          	TermTxSR(term_no);
 		 } 
      
      else if (x == RXRDY) {
@@ -165,10 +165,8 @@ void TermSR(int term_no) {
 	  } 
 
     //printf("Out of Term**SR\n");
-
 	  if (term[term_no].tx_missed == TRUE) { //the tx_missed flag is TRUE, also call TermTxSR(term_no)
-		  //printf("Moving into TermTxSR because tranmission was missed\n");
-      TermTxSR(term_no);
+		TermTxSR(term_no);
 	  }
 
 } 
@@ -179,35 +177,36 @@ void TermSR(int term_no) {
     //if the out_q in terminal interface data structure is empty:
          //if (QisEmpty(&(term[term_no]))) {
 //         printf("Checking if out_q is empty\n");
-			     if (QisEmpty(&term[term_no].echo_q) &&  QisEmpty(&term[term_no].out_q)) {
+         if (QisEmpty(&term[term_no].out_q) && QisEmpty(&term[term_no].echo_q)) {
              //printf("Queue is empty\n");
-           term[term_no].tx_missed = TRUE;	//1. set the tx_missed flag to TRUE
-			      return;							//2. return
-		    } 
+           term[term_no].tx_missed = TRUE;
+		return;							//2. return
+	}
+ 
      else {
-       if (!QisEmpty(&term[term_no].echo_q)) { //using reverse logic from coding hints
-         printf("DeQ from echo q\n");
-              c = DeQ(&term[term_no].echo_q);
-       }
-       else{
-         c = DeQ(&term[term_no].out_q);
-         MuxOpSR(term[term_no].out_mux, UNLOCK);
-
-         }
-         
-            
+		if(!QisEmpty(&term[term_no].echo_q)){
+              		c = DeQ(&term[term_no].echo_q);
+		}
+		else{
+			c = DeQ(&term[term_no].out_q);
+			MuxOpSR(term[term_no].out_mux, UNLOCK);
+		}
+		outportb(term[term_no].io_base+DATA,c);
+		term[term_no].tx_missed = FALSE;
+              
+         } 
           //printf("Dequeued %c, sending to DATA\n", c);
-          outportb(term[term_no].io_base+DATA,c);//2. use outportb() to send it to the DATA register of the terminal port 
+          //outportb(term[term_no].io_base+DATA,c);//2. use outportb() to send it to the DATA register of the terminal port 
 			    //printf("Sent %c to DATA\n", c);
 //          printf("term_no is %d\n", term_no);
-          term[term_no].tx_missed = FALSE;//3. set the tx_missed flag to FALSE
+          //term[term_no].tx_missed = FALSE;//3. set the tx_missed flag to FALSE
     			//printf("term_no before unlock is %d\n", term_no);
-         // MuxOpSR(term[term_no].out_mux, UNLOCK); //4. unlock the out_mux of the terminal interface data structure
+          //MuxOpSR(term[term_no].out_mux, UNLOCK); //4. unlock the out_mux of the terminal interface data structure
 	  
     //UNLOCK TERM_ID incorrect and doesnt work
     
 //    printf("Unlocked Mux id %d\n", term[term_no].out_mux);
-     }
+     
 
    }
 
@@ -223,7 +222,8 @@ void TermSR(int term_no) {
 
      if(ch == '\r') { // for some reason this is its own sperate if from coding hints
        EnQ('\0', &(term[term_no].in_q));  
-     } else {
+     } 
+	else {
           EnQ(ch, &(term[term_no].in_q));
        }
 
