@@ -83,28 +83,55 @@ void UserProc(void) {
    str1[4] = '0' + my_pid/10;
    str1[5] = '0' + my_pid%10;
    
-   while(1) {
+   while(1){
+	
+	WriteCall(which_term, str1); // promt for terminal input
+	ReadCall(which_term, str2); // read terminal input
+  
+  // compare str2 and "fork", if not the same -> "continue;"
+  
+  // make a ForkCall() and get its return
+  
+  //if it returns NONE {
+      //promt to terminal: "Couldn't fork!"
+      //continue;
+  //}
+  
+  //if the return is == 0 --> call Aout(device); child code
+  
+  //promt to terminal: the child PID //parent code
+  
+  //additional prompt to terminal "\n\r" would look better like the demo
+  
+  // make a WaitCall() and get an exit code from child
+  
+  //prompt to terminal: the child exit code (see demo)
+  
+  //must try your Itoa() (in k-lib.c) to convert exit code to str for prompting
 
-      //MuxOpCall(vid_mux, LOCK);
-      
-      /*
-//      printf("writing to STDOUT %d\n", STDOUT);
-      WriteCall(STDOUT, str1);  // show my PID
- //     printf("wrinting to term %d\n", which_term);
-      WriteCall(which_term, str1);
-      WriteCall(which_term, "\n\r");
-      SleepCall(50);
+  //additional prompt to terminal "\n\r" would look better like the demo
 
-                     // erasure
- //     printf("Erasing text from display\n");
-      WriteCall(STDOUT, str2);
-      SleepCall(50);
-      MuxOpCall(vid_mux, UNLOCK);
-	*/
-	WriteCall(which_term, str1);
-	ReadCall(which_term, str2);
-	WriteCall(STDOUT, str2);
+	//WriteCall(STDOUT, str2); MAY NOT NEED THIS- FROM CODING HINTS
    }
 }
 
 
+void Aout(int device) {
+    //get my PID
+    char str[] = "xx ( ) HelloWorld!\n\r";
+
+    //in the above str, replace xx with my PID, and a alpabet inside
+    //the bracket (alphabet B if my PID is 2, C if 3, D if 4, ect)
+    
+    //prompt to terminal the str // use same device as parent
+    
+    //slide my alphabet across the Target PC display:
+    //cycle thru columns 0 to 69 {
+        //use ShowCharCall( ...
+        //use Sleepcall(10);
+        //use ShowCharCall(...
+    //}
+    
+    //call ExitCall with an exit code that is my_pid * 100
+
+}
