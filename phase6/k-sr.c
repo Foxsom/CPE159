@@ -234,54 +234,86 @@ void TermSR(int term_no) {
 
 // for phase 6 JR
 int ForkSR(void) {
+    int cpid; // childs pid
+    int *p;
     //a. if pid_q is empty:
-      //1. prompt panic msg to PC
-      //2. return NONE
+    if(QisEmpty(&pid_q)) {
+          //1. prompt panic msg to PC
+          cons_printf("Panic: PID Queue is Empty");
+          //return NONE
+          return NONE;
+      }
     
     //b. get a child PID from pid_q (build a new PCB for new child process)
+    cpid = DeQ(&pid_q);
 
     //c. clear the child PCB
+    Bzero((char *)&pcb[cpid], sizeof(pcb_t));    
 
     //d. set the state in the child PCB to ...
-    
-    //e. set the ppid in the child PSB to ...
-    
+    pcb[cpid].state = READY;   
+
+    //e. set the ppid in the child PCB to ...
+    pcb[cpid].ppid = WAIT;    
+
     //f. enqueue the child PID to ...
+    EnQ(cpid, &ready_q);
 
     //g. get the differnce between the locations of teh child's stack and the parent's 
-    
+
+
     //h. copy the parent's trapframe_p  to the childs trapframe_p
     
+
     //i. copy the parent's proc stack to the child (use your own MemCpy())
 
+
     //j.set the eax in the new trapframe to 0 (child proc gets 0 from ForkCall())
-    
+   pcb[cpid].trapframe_p -> eax = 0;
+
     //k. apply the location adjustment to esp, ebp, esi, edi, in the new trapframe 
     //(nested base ptrs adjustment:)
-    
+   // pcb[cpid].trapframe_p -> esp;
+   // pcb[cpid].trapframe_p -> ebp;
+   // pcb[cpid].trapframe_p -> esi;
+   // pcb[cpid].trapframe_p -> edi;
+
     //l. set an integer pointer p to ebp in the new trapframe
-    
-    //m. while (what p points to is not 0) {
+    //p = pcb[cpid].trapframe_p -> ebp;       
+    //m. while (what p points to is not 0) 
+    while (p != 0){
        // 1. apply the location adjustment to the value pointed 
        // 2. set p to the adjusted value (need a typecast)
-     // }
+      }
     
     //n. return child PID
+    return cpid;
 }
 
 int WaitSR(void) { //parent waits
     // loop thru the PCB array (looking for a ZOMBIE child):
     // the proc ppid is run_pid and the state is ZOMBIE -> break the loop
-    
+   int i;
+   int code;
+   for(i = 0; i< sizeof(pcb_t); i++) {
+          if(pcb[run_pid].state = ZOMBIE) {
+              break;
+            }
+            
+      }    
     //if the whole PCB array was looped thru (didnt find any ZOMBIE child):
       //1. alter the state of run_pid to ...
+      pcb[run_pid].state = WAIT;
       //2. set run_pid to ...
+      run_pid = NONE;
       //3. return NONE
+      return NONE;
       
     // get its exit code (from the eax of the child's trapframe)
     
     // reclaim child's recoruses:
       //1. alter its state to ..
+      
       //2. enqueue its PID to ...
       
     // return the exit code 
