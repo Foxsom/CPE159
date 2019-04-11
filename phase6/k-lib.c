@@ -63,17 +63,41 @@ void EnQ(int to_add, q_t* p) {
   //    p->q[p->tail] = NONE;
 }
 
-// for phase 6
- 
-//void MemCpy( (char *) dst, (char *) src, int size) {
-    //this copies 'size' of bytes from 'src' to 'dst'  
-//}
+void MemCpy((char *) dst, (char *) src, int size) {
+    int i;
+    for (i = 0; i<size; i++){
+      *dst = *src;
+      dst++;
+      src++;
+    }
+}
 
 int StrCmp(char *str1, char *str2) {
-    //returns TRUE if str1 and str2 are the same , otherwise, 0  
+    //returns TRUE if str1 and str2 are the same , otherwise, 0
+    int result = 1;
+    while (*str1!='\0' && *str2!='\0'){
+      if(*str1!=*str2) result = 0;
+      str1++;
+      str2++;
+
+      }
+    if(*str1!='\0' || *str2!='\0') result = 0;
+    return result;
 }
 
 void Itoa(char *str, int x) {
-    //converts an unsigned decimal number x < 100000 into str  
+    //converts an unsigned decimal number x < 100000 into str
+    char[] converedNum;
+    int i;
+
+    if(x>100000) 
+	return;
+
+    convertedNum = x + '0';
+
+    for (i=0; i<strlen(convertedNum); i++){
+      *str = convertedNum[i];
+      str++;
+    }
 }
 

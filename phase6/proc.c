@@ -89,49 +89,71 @@ void UserProc(void) {
 	ReadCall(which_term, str2); // read terminal input
   
   // compare str2 and "fork", if not the same -> "continue;"
-  
+  if(!StrCmp(str2, "fork")) continue;
+
   // make a ForkCall() and get its return
-  
+	int forkReturn = ForkCall();  
   //if it returns NONE {
       //promt to terminal: "Couldn't fork!"
       //continue;
   //}
+  if(forkReturn==NONE){
+	WriteCall(which_term, "Couldn't Fork");
+	continue;	
+  }
+
+  if(forkReturn==0){
+	Aout(which_term);
+  }
   
   //if the return is == 0 --> call Aout(device); child code
   
   //promt to terminal: the child PID //parent code
-  
+  char[] childPIDPrint = "Child PID:   ";
+  childPIDPrint[11] = forkReturn/10;
+  childPIDPrint[12] = forkReturn%10;
+  WriteCall(which_term, childPIDPrint);
+  WriteCall(which_term, "\n\r");
+
   //additional prompt to terminal "\n\r" would look better like the demo
   
   // make a WaitCall() and get an exit code from child
-  
+  int exitCode = WaitCall();  
+  char[] exitCodeStr = Itoa(&exitCodeStr, exitCode);
   //prompt to terminal: the child exit code (see demo)
-  
+  WriteCall(which_term, exitCodeStr);
   //must try your Itoa() (in k-lib.c) to convert exit code to str for prompting
 
   //additional prompt to terminal "\n\r" would look better like the demo
-
+  WriteCall(which_term, "\n\r");
 	//WriteCall(STDOUT, str2); MAY NOT NEED THIS- FROM CODING HINTS
    }
 }
 
 
 void Aout(int device) {
-    //get my PID
+    int pid = GetPidCall();
     char str[] = "xx ( ) HelloWorld!\n\r";
 
     //in the above str, replace xx with my PID, and a alpabet inside
+    str[0] = pid/10;
+    str[1] = pid%10;
     //the bracket (alphabet B if my PID is 2, C if 3, D if 4, ect)
-    
     //prompt to terminal the str // use same device as parent
-    
+    char alph = (char)pid;
+    str[4] = alph;
+
+    WriteCall(device, str);
+
     //slide my alphabet across the Target PC display:
     //cycle thru columns 0 to 69 {
-        //use ShowCharCall( ...
-        //use Sleepcall(10);
-        //use ShowCharCall(...
-    //}
-    
-    //call ExitCall with an exit code that is my_pid * 100
+    int column = 0;
+    for(column; column<70; column++){
+        ShowCharCall(pid, column, alph);
+        Sleepcall(10);
+        ShowCharCall(pid, column, ' ');
+    }
+    int exitCode = pid*100;
+    ExitCall(exitCode);
 
 }

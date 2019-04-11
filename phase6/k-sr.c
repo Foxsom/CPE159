@@ -234,6 +234,9 @@ void TermSR(int term_no) {
 
 // for phase 6 JR
 int ForkSR(void) {
+    printf("ForkSR\n");
+	/*
+    int parentPID = GetPIDSR();
     int cpid; // childs pid
     int *p;
     //a. if pid_q is empty:
@@ -254,85 +257,109 @@ int ForkSR(void) {
     pcb[cpid].state = READY;   
 
     //e. set the ppid in the child PCB to ...
-    pcb[cpid].ppid = WAIT;    
+    pcb[cpid].ppid = parentPID;    
 
     //f. enqueue the child PID to ...
     EnQ(cpid, &ready_q);
 
     //g. get the differnce between the locations of teh child's stack and the parent's 
-
+    int stackDif = &proc_stack[cpid] - &proc_stack[parentPID];
 
     //h. copy the parent's trapframe_p  to the childs trapframe_p
-    
+    pcb[cpid].*trapframe_p = pcb[ppid].*trapframe_p;
 
     //i. copy the parent's proc stack to the child (use your own MemCpy())
-
+    MemCpy(&proc_stack[cpid], &proc_stack[ppid], PROC_STACK_SIZE);
 
     //j.set the eax in the new trapframe to 0 (child proc gets 0 from ForkCall())
    pcb[cpid].trapframe_p -> eax = 0;
 
     //k. apply the location adjustment to esp, ebp, esi, edi, in the new trapframe 
     //(nested base ptrs adjustment:)
-   // pcb[cpid].trapframe_p -> esp;
-   // pcb[cpid].trapframe_p -> ebp;
-   // pcb[cpid].trapframe_p -> esi;
-   // pcb[cpid].trapframe_p -> edi;
+    //pcb[cpid].trapframe_p -> esp = ;
+    //pcb[cpid].trapframe_p -> ebp = ;
+    //pcb[cpid].trapframe_p -> esi = ;
+    //pcb[cpid].trapframe_p -> edi = ;
 
     //l. set an integer pointer p to ebp in the new trapframe
-    //p = pcb[cpid].trapframe_p -> ebp;       
+    p = &pcb[cpid].trapframe_p -> ebp;       
     //m. while (what p points to is not 0) 
-    while (p != 0){
+    while (*p != 0){
        // 1. apply the location adjustment to the value pointed 
        // 2. set p to the adjusted value (need a typecast)
       }
     
     //n. return child PID
     return cpid;
+*/ return 0;
 }
 
 int WaitSR(void) { //parent waits
+    printf("WaitSR\n");
+    /*
     // loop thru the PCB array (looking for a ZOMBIE child):
     // the proc ppid is run_pid and the state is ZOMBIE -> break the loop
    int i;
+   int cpid; //NEEDS TO BE SET
    int code;
-   for(i = 0; i< sizeof(pcb_t); i++) {
-          if(pcb[run_pid].state = ZOMBIE) {
+   for(i = 0; i< PROC_SIZE; i++) {
+          if(run_pid == pcb[run_pid].ppid && pcb[i].state = ZOMBIE) {
               break;
             }
             
       }    
     //if the whole PCB array was looped thru (didnt find any ZOMBIE child):
-      //1. alter the state of run_pid to ...
-      pcb[run_pid].state = WAIT;
-      //2. set run_pid to ...
-      run_pid = NONE;
-      //3. return NONE
-      return NONE;
-      
+    if(i==PROC_SIZE){
+      	//1. alter the state of run_pid to ...
+      	pcb[run_pid].state = WAIT;
+      	//2. set run_pid to ...
+      	run_pid = NONE;
+      	//3. return NONE
+      	return NONE;
+      }
+
     // get its exit code (from the eax of the child's trapframe)
-    
+      code = pcb[cpid].trapframe_p->eax;
     // reclaim child's recoruses:
       //1. alter its state to ..
-      
+      pcb[cpid].state = UNUSED;
       //2. enqueue its PID to ...
-      
+      EnQ(cpid, pid_q);
     // return the exit code 
+    return code;
+*/
+return 1;
 }
 
 void ExitSR(int exit_code) {
+     printf("ExitSR\n");
+     /*
     //if the process state of my parent (ppid) is not WAIT:
+    int ppid = pcb[run_pid].ppid;
+    if(pcb[ppid].state != WAIT){
       //1. alter my state to ...
+      pcb[run_pid].state = ZOMBIE;
       //2. reset run_pid to ...
+      run_pid = NONE;
       //3. return
-    
+      return;
+    }
+
     // alter the state of ppid to ...
+      pcb[ppid].state = READY;
     // enqueue ppid to ...
+      EnQ(ppid, ready_q);
     // dont forget to pass it the exit code (via eax of parents trapframe)
-    
+      pcb[ppid].trapframe->eax = exit_code;
+
     //reclaim childs resources:
       //1.alter its state to ...
-      //2. enqueue its PID to ...
+ 	pcb[run_pid].state = UNUSED;	
+     //2. enqueue its PID to ...
+        EnQ(run_pid, pid_q);
       //reset run_pid to ...
-      
+        run_pid = NONE;
+
+*/
 }
 

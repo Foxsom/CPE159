@@ -137,17 +137,21 @@ int ForkCall(void) {
 // returns the PID of new child process to the calling (parent) process
 // or NONE if the call fails
 //if successful the child get 0
+printf("Starting ForkCall\n");
+	//return ForkSR();
 
 }
 
 int WaitCall(void) {
 //returns the exit code form the child process (as it exits)
-
+printf("WaitCall\n");
+//	return WaitSR();
 }
 
 void ExitCall(int exit_code) {
 // called by an exiting process, an exit code is given to return to
 // its parent process
-  
+  printf("ExitCall\n");
+ // ExitSR(exit_code);
 }
 
