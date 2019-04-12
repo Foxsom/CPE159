@@ -238,6 +238,8 @@ int ForkSR(void){
 	int cpid;
 	int *p;
 	int stackDif;
+  
+
 	cons_printf("Starting ForkSR\n");
 	if (QisEmpty(&pid_q)){
 		cons_printf("Panic: PID Queue is Empty\n");
@@ -246,7 +248,7 @@ int ForkSR(void){
 	}
 
 	cpid = DeQ(&pid_q);
-	cons_printf("CPID = %d\n",cpid); 
+	//cons_printf("CPID = %d\n",cpid); 
 	Bzero((char *)&pcb[cpid], sizeof(pcb_t));
 
 	pcb[cpid].state = READY;
@@ -271,13 +273,11 @@ int ForkSR(void){
 
 	p = (int *)pcb[cpid].trapframe_p ->ebp;
 	while(*p!=0){
-		
-		*p = *p + stackDif;
-		
-		p = *p;
+	  *p = *p+stackDif;
+    p = (int *)*p;
 	}
 
-	cons_printf("Fork returning cpid: %d", cpid);	
+	//cons_printf("Fork returning cpid: %d", cpid);	
 	return cpid;
 }	
 

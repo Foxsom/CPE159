@@ -87,12 +87,20 @@ int StrCmp(char *str1, char *str2){
 }
 
 void Itoa(char *str, int x){
-	cons_printf("Itoa Input is %d\n", x);
+	//cons_printf("Itoa Input is %d\n", x);
 	
+  int i, j, divider;
+
 	if(x>100000){
 		return;
 	}
 	
-	
-	
+	for (i = 0; i<5;i++){
+    for(j = 0; j<i; j++){
+      divider = divider/10;
+      }
+    *str = ((x/divider)+'0');
+    str++;
+    }
+	*str = x%10;
 }

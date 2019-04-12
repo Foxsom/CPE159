@@ -156,6 +156,12 @@ int WaitCall(void){
 
 
 void ExitCall(int exit_code){
-	asm("int $55");
+	asm("movl %0, %%eax;
+       int %1;"
+       :
+       :"g" (exit_code), "g" (EXIT_CALL)
+       : "eax"
+  );
+
 
 }

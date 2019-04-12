@@ -143,16 +143,16 @@ void Kernel(trapframe_t *trapframe_p) {           // kernel runs
       break;
     case FORK_CALL:
 	cons_printf("Forking\n");
-	ForkSR();	
+	trapframe_p->eax = ForkSR();	
 	break;
     case WAIT_CALL:
 	cons_printf("Waiting\n");
-	WaitSR();
+	trapframe_p->eax = WaitSR();
 	break;
 	
     case EXIT_CALL:	
 	cons_printf("Exitting\n");
-	ExitSR(0);	
+	ExitSR(trapframe_p->eax);	
 	break;
   }
 
