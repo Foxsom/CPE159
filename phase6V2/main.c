@@ -142,13 +142,16 @@ void Kernel(trapframe_t *trapframe_p) {           // kernel runs
       outportb(PIC_CONTROL, TERM1_DONE);
       break;
     case FORK_CALL:
+	cons_printf("Forking\n");
 	ForkSR();	
 	break;
     case WAIT_CALL:
+	cons_printf("Waiting\n");
 	WaitSR();
 	break;
-
-    case EXIT_CALL:
+	
+    case EXIT_CALL:	
+	cons_printf("Exitting\n");
 	ExitSR(0);	
 	break;
   }

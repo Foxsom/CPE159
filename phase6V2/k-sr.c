@@ -258,24 +258,32 @@ int ForkSR(void){
 	
 	pcb[cpid].trapframe_p = pcb[ppid].trapframe_p;
 	
-	MemCpy(&proc_stack[cpid], &proc_stack[ppid], PROC_STACK_SIZE);
+	MemCpy(proc_stack[cpid], proc_stack[ppid], PROC_STACK_SIZE);
 
 	pcb[cpid].trapframe_p->eax = 0;
+	
 
 	//Adjust location adjustment esp, ebp, esi, edi
+	pcb[cpid].trapframe_p->esp = pcb[cpid].trapframe_p->esp+stackDif;
+	pcb[cpid].trapframe_p->ebp = pcb[cpid].trapframe_p->ebp+stackDif;
+	pcb[cpid].trapframe_p->esi = pcb[cpid].trapframe_p->esi+stackDif;
+	pcb[cpid].trapframe_p->edi = pcb[cpid].trapframe_p->edi+stackDif;
 
-	p = &pcb[cpid].trapframe_p ->ebp;
+	p = (int *)pcb[cpid].trapframe_p ->ebp;
 	while(*p!=0){
-		//apply the location adjustment
-		//set p to the adjusted value
-
+		
+		*p = *p + stackDif;
+		
+		p = *p;
 	}
-	
+
+	cons_printf("Fork returning cpid: %d", cpid);	
 	return cpid;
 }	
 
 int WaitSR(void){
 	int i, code;
+
 	for(i=0; i<PROC_SIZE; i++){
 		if((run_pid == pcb[run_pid].ppid) && (pcb[i].state == ZOMBIE)){
 			break;

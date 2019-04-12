@@ -7,6 +7,7 @@
 #include "k-data.h"
 #include "k-lib.h"
 #include "k-include.h"
+#include "proc.h"
 
 void InitTerm(int term_no){
   int i, j;
@@ -113,6 +114,7 @@ void UserProc(void) {
 	}
 	
 	forkPid = ForkCall();
+	cons_printf("Done with Fork\n");
 	if(forkPid==NONE){
 		WriteCall(which_term, "Couldn't fork!");
 		continue;
@@ -121,15 +123,15 @@ void UserProc(void) {
 	if(forkPid==0){
 		Aout(which_term);
 	}
-
+	cons_printf("User forkPID = %d\n", forkPid);
 	//childPIDPrint = "Child PID:   ";
 	childPIDPrint[11] = forkPid/10;
 	childPIDPrint[12] = forkPid%10;
 	WriteCall(which_term, childPIDPrint);
 	WriteCall(which_term, "\n\r");
 
-	exitCode = WaitCall();
-	Itoa(&exitCodeStr, exitCode);
+	//exitCode = WaitCall();
+	//Itoa(&exitCodeStr, exitCode);
 	WriteCall(which_term, exitCodeStr);
 	WriteCall(which_term, "\n\r");
     }
@@ -138,7 +140,7 @@ void UserProc(void) {
 void Aout(int device){
 	int pid = GetPidCall();
 	char str[] = "xx ( ) HelloWorld!\n\r";
-	char alph = (char)pid;
+	char alph = '@'+ pid;
 	int column = 0;
 	int exitCode = pid*100;
 
@@ -153,5 +155,5 @@ void Aout(int device){
 		SleepCall(10);
 		ShowCharCall(pid, column, ' ');
 	}	
-	ExitCall(exitCode);	
+	//ExitCall(exitCode);	
 }

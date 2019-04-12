@@ -88,7 +88,7 @@ int StrCmp(char *str1, char *str2){
 
 void Itoa(char *str, int x){
 	cons_printf("Itoa Input is %d\n", x);
-	//char convertedNum[] = '0' +x;
+	
 	if(x>100000){
 		return;
 	}

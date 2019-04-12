@@ -132,14 +132,28 @@ void ReadCall (int device, char *str) {
   }
 
 int ForkCall(void){
-	asm("int $53");
-return 0;
+	int pid;
+	asm("int %1;
+      movl %%eax, %0"
+      : "=g" (pid)
+      : "g" (FORK_CALL)
+      : "eax"
+  );
+	return pid;	
 }
 
 int WaitCall(void){
-	asm("int $54");
-return 0;
+	int exitCode;
+        asm("int %1;
+      movl %%eax, %0"
+      : "=g" (exitCode)
+      : "g" (WAIT_CALL)
+      : "eax"
+  );
+        return exitCode;
 }
+
+
 
 void ExitCall(int exit_code){
 	asm("int $55");
