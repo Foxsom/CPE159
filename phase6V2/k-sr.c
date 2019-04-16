@@ -238,9 +238,7 @@ int ForkSR(void){
 	int cpid;
 	int *p;
 	int stackDif;
-  
-
-	cons_printf("Starting ForkSR\n");
+	//cons_printf("Starting ForkSR\n");
 	if (QisEmpty(&pid_q)){
 		cons_printf("Panic: PID Queue is Empty\n");
 		return NONE;	
@@ -255,61 +253,76 @@ int ForkSR(void){
 	pcb[cpid].ppid = ppid;
 
 	EnQ(cpid, &ready_q);
-
-	stackDif= &proc_stack[cpid] - &proc_stack[ppid];
 	
-	pcb[cpid].trapframe_p = pcb[ppid].trapframe_p;
-	
-	MemCpy(proc_stack[cpid], proc_stack[ppid], PROC_STACK_SIZE);
+	stackDif= &proc_stack[cpid][0] - &proc_stack[ppid][0];
+	//cons_printf("Diff = %d\n", stackDif);	
+	pcb[cpid].trapframe_p = (trapframe_t *)((int)pcb[ppid].trapframe_p+stackDif);
+	//cons_printf("ppid trapframe = %d, cpid trapframe = %d\n", pcb[ppid].trapframe_p, pcb[cpid].trapframe_p);
+	MemCpy((char *)&proc_stack[cpid][0], (char *)&proc_stack[ppid][0], PROC_STACK_SIZE);
 
 	pcb[cpid].trapframe_p->eax = 0;
 	
-
+		
+	
+	
 	//Adjust location adjustment esp, ebp, esi, edi
-	pcb[cpid].trapframe_p->esp = pcb[cpid].trapframe_p->esp+stackDif;
-	pcb[cpid].trapframe_p->ebp = pcb[cpid].trapframe_p->ebp+stackDif;
-	pcb[cpid].trapframe_p->esi = pcb[cpid].trapframe_p->esi+stackDif;
-	pcb[cpid].trapframe_p->edi = pcb[cpid].trapframe_p->edi+stackDif;
+	pcb[cpid].trapframe_p->esp =pcb[cpid].trapframe_p->esp+stackDif;
+	pcb[cpid].trapframe_p->ebp =pcb[cpid].trapframe_p->ebp+stackDif;
+	pcb[cpid].trapframe_p->esi =pcb[cpid].trapframe_p->esi+stackDif;
+	pcb[cpid].trapframe_p->edi =pcb[cpid].trapframe_p->edi+stackDif;
+	//cons_printf("ppid ebp = %d, cpid ebp = %d\n", pcb[ppid].trapframe_p->ebp,pcb[cpid].trapframe_p->ebp);
 
 	p = (int *)pcb[cpid].trapframe_p ->ebp;
+	//cons_printf("Initial *p = %d\n", *p);
+
 	while(*p!=0){
-	  *p = *p+stackDif;
-    p = (int *)*p;
+					
+		*p = *p + stackDif;
+		
+		p = (int *)*p;
+		//cons_printf("New *p = %d\n", *p);
 	}
 
-	//cons_printf("Fork returning cpid: %d", cpid);	
+	//cons_printf("Fork returning cpid: %d\n", cpid);	
 	return cpid;
 }	
 
 int WaitSR(void){
 	int i, code;
-
+	
 	for(i=0; i<PROC_SIZE; i++){
-		if((run_pid == pcb[run_pid].ppid) && (pcb[i].state == ZOMBIE)){
+		if((run_pid == pcb[i].ppid) && (pcb[i].state == ZOMBIE)){
 			break;
 		}
 	}
+	//cons_printf("i: %d	PROCSIZE: %d\n", i, PROC_SIZE);
 	
 	if(i==PROC_SIZE){
 		pcb[run_pid].state = WAIT;
 		run_pid = NONE;
 		return NONE;
 	}
-
+	
 	code = pcb[i].trapframe_p->eax;
+	//cons_printf("code: %d\n", code);
+
 	pcb[i].state = UNUSED;
 	EnQ(i, &pid_q);
 	return code;
+
 } 
 
 void ExitSR(int exit_code){
+	//cons_printf("Exitting with code: %d\n", exit_code);
+	
 	int ppid = pcb[run_pid].ppid;
 	if(pcb[ppid].state!=WAIT){
+	//	cons_printf("Parent not waiting\n");
 		pcb[run_pid].state = ZOMBIE;
 		run_pid = NONE;
 		return;
 	}
-
+	//cons_printf("Parent is waiting\n");
 	pcb[ppid].state = READY;
 	EnQ(ppid, &ready_q);
 	pcb[ppid].trapframe_p->eax = exit_code;

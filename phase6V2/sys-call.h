@@ -15,7 +15,7 @@ extern int MuxCreateCall(int flag);
 extern void MuxOpCall(int mux_id, int opcode);
 extern void WriteCall(int device, char *str);
 extern void ReadCall(int device, char *str);
-int ForkCall(void);
-int WaitCall(void);
-void ExitCall(int exit_code);
+extern int ForkCall(void);
+extern int WaitCall(void);
+extern void ExitCall(int exit_code);
 #endif

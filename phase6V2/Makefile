@@ -331,7 +331,7 @@ $(MY_DLI) :	$(OBJECTS) Makefile
 #  Dependencies.
 #### YQYQYQ-MARK-2 ####
 #
-#  Dependencies generated Thu Apr 11 18:21:06 PDT 2019 by (spede-mkmf $Revision: 1.2 $/1)
+#  Dependencies generated Mon Apr 15 15:41:18 PDT 2019 by (spede-mkmf $Revision: 1.2 $/1)
 #
 
 k-entry.o: k-entry.S k-const.h \
@@ -397,7 +397,8 @@ proc.o: proc.c k-const.h sys-call.h k-data.h k-type.h k-lib.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/proc_reg.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/seg.h \
  /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/asmacros.h \
- /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/rs232.h
+ /gaia/home/project/spede2/Target-i386/i686/gnu/i386-unknown-gnu/include/spede/machine/rs232.h \
+ proc.h
 sys-call.o: sys-call.c k-const.h k-type.h k-sr.h k-data.h k-lib.h
 
 #### YQYQYQ-STOP-2 ####

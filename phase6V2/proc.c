@@ -73,8 +73,8 @@ void UserProc(void) {
 //   int which_term;
    int my_pid = GetPidCall();
    int forkPid, exitCode;
-   char childPIDPrint[] = "Child PID:   ";
-   char exitCodeStr[] = "  ";  
+   char childPIDPrint[] = "Child PID:     ";
+   char exitCodeStr[] = "Exit Code:    ";  
    //char str1[STR_SIZE] = "PID    process is running exclusively using the video display...";
    //char str2[STR_SIZE] = "                                                                ";
    char str1[STR_SIZE] = "PID    > ";
@@ -114,40 +114,44 @@ void UserProc(void) {
 	}
 	
 	forkPid = ForkCall();
-	cons_printf("Done with Fork\n");
+	
+	//cons_printf("Done with Fork\n");
 	if(forkPid==NONE){
 		WriteCall(which_term, "Couldn't fork!");
 		continue;
 	}
 
 	if(forkPid==0){
+		//cons_printf("Child pid: Moving to Aout\n");
 		Aout(which_term);
 	}
-	cons_printf("User forkPID = %d\n", forkPid);
-	//childPIDPrint = "Child PID:   ";
-	childPIDPrint[11] = forkPid/10;
-	childPIDPrint[12] = forkPid%10;
+	//cons_printf("User forkPID = %d\n", forkPid);
+	//childPIDPrint[] = "Child PID:   ";
+	childPIDPrint[11] = (forkPid/10)+'0';
+	childPIDPrint[12] = (forkPid%10)+'0';
 	WriteCall(which_term, childPIDPrint);
 	WriteCall(which_term, "\n\r");
-
-	//exitCode = WaitCall();
-	//Itoa(&exitCodeStr, exitCode);
+	//cons_printf("%c\n", childPIDPrint);
+	exitCode = WaitCall();
+	Itoa((char *)&exitCodeStr[11], exitCode);
+	//cons_printf("%d\n", exitCode);
 	WriteCall(which_term, exitCodeStr);
 	WriteCall(which_term, "\n\r");
     }
 }
 
 void Aout(int device){
+
 	int pid = GetPidCall();
 	char str[] = "xx ( ) HelloWorld!\n\r";
 	char alph = '@'+ pid;
-	int column = 0;
 	int exitCode = pid*100;
+	int column = 0;	
 
-	str[0] = pid/10;
-	str[1] = pid%10;
-
+	str[0] = (pid/10)+'0';
+	str[1] = (pid%10)+'0';	
 	str[4] = alph;
+	
 	WriteCall(device, str);
 
 	for(column=0; column<70; column++){
@@ -155,5 +159,6 @@ void Aout(int device){
 		SleepCall(10);
 		ShowCharCall(pid, column, ' ');
 	}	
-	//ExitCall(exitCode);	
+
+	ExitCall(exitCode);	
 }

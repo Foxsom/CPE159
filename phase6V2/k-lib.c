@@ -65,11 +65,12 @@ void EnQ(int to_add, q_t* p) {
 
 void MemCpy(char *dst, char *src, int size){
 	int i;
+	//cons_printf("MemCpy start address = %d\n", dst);
 	for(i = 0; i<size; i++){
-		*dst = *src;
-		dst++;
-		src++;
+	//	cons_printf("MemCpy: Address %x, Value copied = %x\n",dst, *src);
+		dst[i] = src[i];
 	}
+	//cons_printf("MemCpy end address = %d\n", dst);
 }
 
 int StrCmp(char *str1, char *str2){
@@ -87,20 +88,24 @@ int StrCmp(char *str1, char *str2){
 }
 
 void Itoa(char *str, int x){
+	int startx = x;
+	int i = 100000;
+	int j;
+	
+
 	//cons_printf("Itoa Input is %d\n", x);
 	
-  int i, j, divider;
-
 	if(x>100000){
 		return;
 	}
-	
-	for (i = 0; i<5;i++){
-    for(j = 0; j<i; j++){
-      divider = divider/10;
-      }
-    *str = ((x/divider)+'0');
-    str++;
-    }
-	*str = x%10;
+	while(startx/i == 0){
+		i = i/10;
+		startx = x;
+	}
+	for(j = i; j>=10; j= j/10){
+		*str = (char)((x/j)+'0');
+		str++;
+		x = x/j;
+	}
+	*str = (char)((x%10)+'0');
 }
