@@ -22,6 +22,4 @@ extern term_t term[TERM_SIZE];
 
 //Phase 7 FOX
 extern int page_user[PAGE_NUM];
-extern func_p_t2 OuchPtr;
-extern func_p_t2 AoutPtr;
 #endif                         // endif of ifndef

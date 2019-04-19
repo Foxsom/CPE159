@@ -50,6 +50,6 @@ typedef struct {
 } term_t;
 
 //Phase 7 FOX
-typedef void (* func_p_t2)(int);
+typedef void (*func_p_t2)(int);
 #endif
  

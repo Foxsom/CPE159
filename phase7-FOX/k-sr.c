@@ -5,6 +5,7 @@
 #include "k-data.h"
 #include "tools.h"
 #include "k-sr.h"
+#include "proc.h"
 #include "sys-call.h"
 
 // to create a process: alloc PID, PCB, and process stack
@@ -212,14 +213,27 @@ void TermSR(int term_no) {
 
    void TermRxSR(term_no) {
      char ch = inportb(term[term_no].io_base+DATA);
-     
+     int ctrlc = 3;
      EnQ(ch, &(term[term_no].echo_q));
+
+	//Phase 7
+		
+	if(ch == (char)ctrlc){
+		cons_printf("CtrlC detected\n");
+		if(!QisEmpty(&mux[term[term_no].in_mux].suspend_q)){
+			if(pcb[mux[term[term_no].in_mux].suspend_q.q[0]].sigint_handler!=NONE){
+				cons_printf("Calling WrapperSR\n");
+				WrapperSR(mux[term[term_no].in_mux].suspend_q.q[0], pcb[mux[term[term_no].in_mux].suspend_q.q[0]].sigint_handler, term_no);
+			}
+		}
+		
+	}
+
 
      if(ch== '\r') {
        EnQ('\n',&(term[term_no].echo_q));
        
      }
-
      if(ch == '\r') { // for some reason this is its own sperate if from coding hints
        EnQ('\0', &(term[term_no].in_q));  
      } 
@@ -314,7 +328,7 @@ int WaitSR(void){
 
 void ExitSR(int exit_code){
 	//cons_printf("Exitting with code: %d\n", exit_code);
-	
+	int i;
 	int ppid = pcb[run_pid].ppid;
 	if(pcb[ppid].state!=WAIT){
 	//	cons_printf("Parent not waiting\n");
@@ -326,7 +340,11 @@ void ExitSR(int exit_code){
 	pcb[ppid].state = READY;
 	EnQ(ppid, &ready_q);
 	pcb[ppid].trapframe_p->eax = exit_code;
-
+	for(i = 0; i<PAGE_NUM; i++){
+		if(page_user[i] == run_pid){
+			page_user[run_pid] = NONE;
+		}
+	}
 	pcb[run_pid].state = UNUSED;
 	EnQ(run_pid, &pid_q);
 	run_pid = NONE;
@@ -334,6 +352,7 @@ void ExitSR(int exit_code){
 	//Phase 7 FOX
 void ExecSR(int code, int arg){
 	int *codeAddress, *stackAddress, i;
+	trapframe_t *tempTP;
 	(int)codeAddress = NONE;
 	(int)stackAddress =NONE;
 	for(i = 0; i<PAGE_NUM; i++){
@@ -346,39 +365,52 @@ void ExecSR(int code, int arg){
 			}
 			else if((int)stackAddress==NONE){
 				page_user[i] = run_pid;
-				(int)stackAddress = ((i*PAGE_SIZE)+RAM);
+				(int)stackAddress = ((i*PAGE_SIZE)+RAM+PAGE_SIZE);
 			}
 		}
 		if(((int)codeAddress!=NONE)&&((int)stackAddress!=NONE)){
 			break;
 		}		
 	}
-
-	cons_printf("Code Segment Address = %d\n", codeAddress);
-	cons_printf("Stack Segment Address = %d\nAttemting code copy\n", stackAddress);
 	
+	cons_printf("Code Segment Address = %x\n", codeAddress);
+	cons_printf("Stack Segment Address = %x\nAttemting code copy\n", stackAddress);
+	cons_printf("Code Address = %x\n", code);
 	//Code Operations
-	MemCpy((char *)codeAddress, (char *)&code, PAGE_SIZE);	
+	
+	MemCpy((char *)codeAddress, (char *)code, PAGE_SIZE);	
+	
+	
+	
 	
 	cons_printf("Clearing stack\n");
-		
 	//Stack Operations
-	Bzero((char *)stackAddress, sizeof(PAGE_SIZE));
+	Bzero((char *)stackAddress, PAGE_SIZE);
 	cons_printf("Setting stackAddress to arg\n");
+	stackAddress--;
 	*stackAddress = arg;
-	cons_printf("Incrementing stackAddress by 4\n");
-	stackAddress = stackAddress+4;
-	cons_printf("Subtracting 8 from trapframe_p\n");
-	pcb[run_pid].trapframe_p = (trapframe_t *)((int)pcb[run_pid].trapframe_p-8);
+	cons_printf("Address %x = arg=%d\n", stackAddress, arg);
+	cons_printf("Moving stackAddress by 4\n");
+	stackAddress--;
+	cons_printf("Address %x\n", stackAddress);
+	cons_printf("Setting trapframe to stackAddress\n");
+	tempTP=(trapframe_t *)stackAddress;
+	//pcb[run_pid].trapframe_p = (trapframe_t *)stackAddress;
 	cons_printf("Decrementing trapframe_p by 1\n");
-	pcb[run_pid].trapframe_p--;
+	//pcb[run_pid].trapframe_p--;
+	cons_printf("Temp TPAddress before --%x\n", tempTP);
+	tempTP--;
+	cons_printf("Temp TPAddress %x\n", tempTP);
+	
 	cons_printf("Getting efl\n");
-	pcb[run_pid].trapframe_p->efl = EF_DEFAULT_VALUE|EF_INTR; // enables intr
+	tempTP->efl = EF_DEFAULT_VALUE|EF_INTR; // enables intr
    	cons_printf("Getting cs\n");
-	pcb[run_pid].trapframe_p->cs = get_cs();                  // dupl from CPU
+	tempTP->cs = get_cs();                  // dupl from CPU
    	cons_printf("Setting eip\n");
-	pcb[run_pid].trapframe_p->eip =  (int)codeAddress;
-
+	*tempTP->eip =  codeAddress;
+	cons_printf("End of Code\n");
+	
+	pcb[run_pid].trapframe_p = tempTP;
 }
 
 void SignalSR(int sig_num, int handler){
@@ -386,6 +418,11 @@ void SignalSR(int sig_num, int handler){
 }
 
 void WrapperSR(int pid, int handler, int arg){
-	pcb[run_pid].trapframe_p = (trapframe_t *)((int)pcb[run_pid].trapframe_p-12);
+	//pcb[run_pid].trapframe_p = (trapframe_t *)((int)pcb[run_pid].trapframe_p-3);
+	pcb[run_pid].trapframe_p = pcb[run_pid].trapframe_p - 3;
+	*(int*)(pcb[run_pid].trapframe_p+1) = arg;
+	*(int*)(pcb[run_pid].trapframe_p+2) = handler;
+	*(int*)(pcb[run_pid].trapframe_p+3) = (int)pcb[run_pid].trapframe_p->eip;
 	
+	pcb[run_pid].trapframe_p->eip = (int)&Wrapper;
 }

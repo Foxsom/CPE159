@@ -84,11 +84,13 @@ void UserProc(void) {
    //printf("PID %d interrupt is %d\n", my_pid, which_term);
   // if(my_pid%2==1) which_term = TERM0_INTR;
   // else which_term = TERM1_INTR;
+  //func_p_t2 *OuchPtr = Ouch(which_term);
+  //func_p_t2 *AoutPtr = Aout(which_term);
    str1[4] = '0' + my_pid/10;
    str1[5] = '0' + my_pid%10;
    
    //Phase 7 FOX
-   SignalCall(SIGINT, (int)OuchPtr);
+   SignalCall(SIGINT, (int)&Ouch);
 
    while(1) {
 
@@ -129,7 +131,8 @@ void UserProc(void) {
 		
 		//Phase 7 FOX
 		cons_printf("Entering ExecCall\n");
-		ExecCall((int)AoutPtr, which_term);
+		//Aout(which_term);
+		ExecCall((int)&Aout, which_term);
 		
 		//Aout(which_term);
 	}
@@ -149,12 +152,15 @@ void UserProc(void) {
 }
 
 void Aout(int device){
-
+	
 	int pid = GetPidCall();
 	char str[] = "xx ( ) HelloWorld!\n\r";
 	char alph = '@'+ pid;
 	int exitCode = pid*100;
 	int column = 0;	
+	
+	cons_printf("Starting Aout\n");
+	
 
 	str[0] = (pid/10)+'0';
 	str[1] = (pid%10)+'0';	

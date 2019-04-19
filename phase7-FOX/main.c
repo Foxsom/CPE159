@@ -21,10 +21,6 @@ struct i386_gate *intr_table;    // intr table's DRAM location
 //Phase 7 Fox
 int page_user[PAGE_NUM] = {NONE};
 
-
-func_p_t2 OuchPtr = Ouch;
-func_p_t2 AoutPtr = Aout;
-
 term_t term[TERM_SIZE] = {
 {TRUE, TERM0_IO_BASE},
 {TRUE, TERM1_IO_BASE}
@@ -173,11 +169,13 @@ void Kernel(trapframe_t *trapframe_p) {           // kernel runs
 	break;
 
 	//Phase 7 FOX
-	case EXEC_CALL:
+    case EXEC_CALL:
+	cons_printf("ExecSR Starting\n");
 	ExecSR(trapframe_p->eax, trapframe_p->ebx);	
 	break;
 
-	case SIGNAL_CALL:
+    case SIGNAL_CALL:
+	cons_printf("SignalSR starting\n");
 	SignalSR(trapframe_p->eax, trapframe_p->ebx);
 	break;
   }
