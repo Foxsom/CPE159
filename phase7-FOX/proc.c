@@ -90,7 +90,7 @@ void UserProc(void) {
    str1[5] = '0' + my_pid%10;
    
    //Phase 7 FOX
-   SignalCall(SIGINT, (int)&Ouch);
+   SignalCall(SIGINT, (int)Ouch);
 
    while(1) {
 
@@ -132,7 +132,7 @@ void UserProc(void) {
 		//Phase 7 FOX
 		cons_printf("Entering ExecCall\n");
 		//Aout(which_term);
-		ExecCall((int)&Aout, which_term);
+		ExecCall((int)Aout, which_term);
 		
 		//Aout(which_term);
 	}
