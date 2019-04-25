@@ -152,7 +152,7 @@ void UserProc(void) {
 }
 
 void Aout(int device){
-	
+/*	
 	int pid = GetPidCall();
 	char str[] = "xx ( ) HelloWorld!\n\r";
 	char alph = '@'+ pid;
@@ -175,8 +175,23 @@ void Aout(int device){
 	}	
 
 	ExitCall(exitCode);	
-}
+*/
 
+int column;
+int pid = GetPidCall();
+int exitCode = pid*100;
+char str[] = "xx ( ) Hello World!\n\r";
+
+//CHANGE STR
+WriteCall(device, str);
+for (column = 0; column<70; column++){
+  ShowCharCall(pid, column, pid+'@');
+  SleepCall(10);
+  ShowCharCall(pid, column, ' ');
+  }
+
+ExitCall(exitCode);
+}
 //Phase 7 FOX
 void Ouch(int device){
 	WriteCall(device, "Can't touch that!\n\n");

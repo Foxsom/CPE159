@@ -272,7 +272,7 @@ int ForkSR(void){
 	//cons_printf("Diff = %d\n", stackDif);	
 	pcb[cpid].trapframe_p = (trapframe_t *)((int)pcb[ppid].trapframe_p+stackDif);
 	//cons_printf("ppid trapframe = %d, cpid trapframe = %d\n", pcb[ppid].trapframe_p, pcb[cpid].trapframe_p);
-	MemCpy((char *)&proc_stack[cpid][0], (char *)&proc_stack[ppid][0], PROC_STACK_SIZE);
+	MemCpy((char *)&proc_stack[ppid][0]+stackDif, (char *)&proc_stack[ppid][0], PROC_STACK_SIZE);
 
 	pcb[cpid].trapframe_p->eax = 0;
 		
@@ -381,6 +381,7 @@ void ExecSR(int code, int arg){
 			break;
 		}		
 	}
+
 	cons_printf("Run_pid = %d\n", run_pid);
 	cons_printf("Code Segment Address = %x\n", codeAddress);
 	cons_printf("Stack Segment Address = %x\nAttemting code copy\n", stackAddress);
