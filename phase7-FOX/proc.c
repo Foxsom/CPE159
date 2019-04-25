@@ -180,8 +180,16 @@ void Aout(int device){
 int column;
 int pid = GetPidCall();
 int exitCode = pid*100;
-char str[] = "xx ( ) Hello World!\n\r";
+char str[] = ") Hello World!\n\r";
+char pidStr[STR_SIZE];
+char letter[STR_SIZE];
+letter[0] = '@'+pid;;
 
+Itoa(pidStr, pid);
+WriteCall(device, pidStr);
+
+WriteCall(device, " (");
+WriteCall(device, letter);
 //CHANGE STR
 WriteCall(device, str);
 for (column = 0; column<70; column++){

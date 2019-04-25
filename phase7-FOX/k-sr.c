@@ -365,9 +365,9 @@ void ExecSR(int code, int arg){
 	(int)codeAddress = NONE;
 	(int)stackAddress =NONE;
 	for(i = 0; i<PAGE_NUM; i++){
-		cons_printf("page_user[%d] = %d\n", i, page_user[i]);
+		//cons_printf("page_user[%d] = %d\n", i, page_user[i]);
 		if(page_user[i]==NONE){
-			cons_printf("Selected page_user[%d]\n", i);	
+		//	cons_printf("Selected page_user[%d]\n", i);	
 			if ((int)codeAddress==NONE){
 				page_user[i] = run_pid;	
 				codeAddress = (int *)((i* PAGE_SIZE)+RAM);
@@ -382,44 +382,44 @@ void ExecSR(int code, int arg){
 		}		
 	}
 
-	cons_printf("Run_pid = %d\n", run_pid);
-	cons_printf("Code Segment Address = %x\n", codeAddress);
-	cons_printf("Stack Segment Address = %x\nAttemting code copy\n", stackAddress);
-	cons_printf("Code Address = %x\n", code);
+	//cons_printf("Run_pid = %d\n", run_pid);
+	//cons_printf("Code Segment Address = %x\n", codeAddress);
+	//cons_printf("Stack Segment Address = %x\nAttemting code copy\n", stackAddress);
+	//cons_printf("Code Address = %x\n", code);
 	//Code Operations
 	//
 	//Bzero((char *)codeAddress, PAGE_SIZE);	
 	MemCpy((char *)codeAddress, (char *)code, PAGE_SIZE);	
 		
-	cons_printf("Clearing stack\n");
+	//cons_printf("Clearing stack\n");
 	//Stack Operations
 	Bzero((char *)stackAddress, PAGE_SIZE);
 	stackAddress = (int*)((int)stackAddress+PAGE_SIZE);
 	stackAddress--;
 
-	cons_printf("Setting stackAddress to arg\n");
+	//cons_printf("Setting stackAddress to arg\n");
 	*stackAddress = arg;
-	cons_printf("Address %x = arg=%d\n", stackAddress, arg);
-	cons_printf("Moving stackAddress by 4\n");
+	//cons_printf("Address %x = arg=%d\n", stackAddress, arg);
+	//cons_printf("Moving stackAddress by 4\n");
 	stackAddress--;
-	cons_printf("Address %x\n", stackAddress);
-	cons_printf("Setting trapframe to stackAddress\n");
+	//cons_printf("Address %x\n", stackAddress);
+	//cons_printf("Setting trapframe to stackAddress\n");
 	
 	pcb[run_pid].trapframe_p = (trapframe_t *)stackAddress;
 	//(int *)pcb[run_pid].trapframe_p-=2;
-	cons_printf("Decrementing trapframe_p by 1\n");
-	cons_printf("Temp TPAddress before --%x\n", pcb[run_pid].trapframe_p);
+	//cons_printf("Decrementing trapframe_p by 1\n");
+	//cons_printf("Temp TPAddress before --%x\n", pcb[run_pid].trapframe_p);
 	pcb[run_pid].trapframe_p--;
-	cons_printf("Temp TPAddress %x\n", pcb[run_pid].trapframe_p);
+	//cons_printf("Temp TPAddress %x\n", pcb[run_pid].trapframe_p);
 	
-	cons_printf("Getting efl\n");
+	//cons_printf("Getting efl\n");
 	pcb[run_pid].trapframe_p->efl = EF_DEFAULT_VALUE|EF_INTR; // enables intr
-   	cons_printf("Getting cs\n");
+   	//cons_printf("Getting cs\n");
 	pcb[run_pid].trapframe_p->cs = get_cs();                  // dupl from CPU
-   	cons_printf("Setting eip\n");
+   	//cons_printf("Setting eip\n");
 	pcb[run_pid].trapframe_p->eip =  (int)codeAddress;
-	cons_printf("Trapframe EIP: %x\n", pcb[run_pid].trapframe_p->eip);
-	cons_printf("End of Code\n");
+	//cons_printf("Trapframe EIP: %x\n", pcb[run_pid].trapframe_p->eip);
+	//cons_printf("End of Code\n");
 	
 	//pcb[run_pid].trapframe_p = (trapframe_t *)tempTP;
 }
