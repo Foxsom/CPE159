@@ -1,7 +1,7 @@
 // main.c, 159
 // OS phase 1
 //
-// Team Name: gdb4life (Members: Tyler Fox, Zachary Derheim, Jesse Root)
+// Team Name: gdb4life (Members: Tyler Fox, Jesse Root)
 #include "k-include.h"  // SPEDE includes
 #include "k-entry.h"    // entries to kernel (TimerEntry, etc.)
 #include "k-type.h"     // kernel data types

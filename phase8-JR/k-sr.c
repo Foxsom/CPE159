@@ -43,8 +43,9 @@ void NewProcSR(func_p_t p) {  // arg: where process code starts
 }
 
 void CheckWakeProc(void){
-   int i;
-   for(i = 0; i<sleep_q.tail; i++){
+   int i, tmp;
+   tmp = sleep_q.tail;
+   for(i = 0; i<tmp; i++){
      int pid = DeQ(&sleep_q);
 //     printf("Checking %d\n", pid);
      if(pcb[pid].wake_centi_sec ==sys_centi_sec) {
@@ -350,7 +351,7 @@ void ExitSR(int exit_code){
 	pcb[ppid].trapframe_p->eax = exit_code;
 	for(i = 0; i<PAGE_NUM; i++){
 		if(page_user[i] == run_pid){
-			page_user[run_pid] = NONE;
+			page_user[i] = NONE;
 		}
 	}
 	pcb[run_pid].state = UNUSED;

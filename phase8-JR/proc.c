@@ -183,7 +183,7 @@ char str[] = "   ( ) Hello World!\n\r";
 str[0] = '0'+pid/10;
 str[1] = '0'+pid%10;
 
-str[4] = 'A'+pid;
+str[4] = 'A' + pid - 1;
 //Itoa(pidStr, pid);
 //WriteCall(device, pidStr);
 //WriteCall(device,str);
