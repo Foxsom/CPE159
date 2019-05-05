@@ -377,26 +377,35 @@ void ExecSR(int code, int arg){
         if(pages[MAIN_TABLE]==NONE){
             pages[MAIN_TABLE] = (i*PAGE_SIZE)+RAM;
             page_user[i] = run_pid;
+            cons_printf("MAIN TABLE: %x\n", pages[MAIN_TABLE]);
           }
 
         else if(pages[CODE_TABLE] == NONE){
             pages[CODE_TABLE] = (i*PAGE_SIZE)+RAM;
             page_user[i] = run_pid;
+            cons_printf("CODE TABLE: %x\n", pages[CODE_TABLE]);
+
           }
 
         else if(pages[STACK_TABLE] == NONE){
             pages[STACK_TABLE] = (i*PAGE_SIZE)+RAM;
             page_user[i] = run_pid;
+            cons_printf("STACK TABLE: %x\n", pages[STACK_TABLE]);
+
           }  
 
         else if(pages[CODE_PAGE] == NONE){
             pages[CODE_PAGE] = (i*PAGE_SIZE)+RAM;
             page_user[i] = run_pid;
+            cons_printf("CODE PAGE: %x\n", pages[CODE_PAGE]);
+
           }
 
         else if(pages[STACK_PAGE] == NONE){
             pages[STACK_PAGE] = (i*PAGE_SIZE)+RAM;
             page_user[i] = run_pid;
+            cons_printf("STACK PAGE: %x\n", pages[STACK_PAGE]);
+
           }
 
         if(pages[MAIN_TABLE]!=NONE && pages[CODE_TABLE]!=NONE &&
@@ -419,43 +428,9 @@ void ExecSR(int code, int arg){
      MemCpy((char *)pages[CODE_PAGE], (char *)code, PAGE_SIZE);
 
      
-/*	OLD EXEC CODE
- 	int * codeAddress;
-	int * stackAddress;
-	int i;
-	(int)codeAddress = NONE;
-	(int)stackAddress =NONE;
-	for(i = 0; i<PAGE_NUM; i++){
-		//cons_printf("page_user[%d] = %d\n", i, page_user[i]);
-		if(page_user[i]==NONE){
-		//	cons_printf("Selected page_user[%d]\n", i);	
-			if ((int)codeAddress==NONE){
-				page_user[i] = run_pid;	
-				codeAddress = (int *)((i* PAGE_SIZE)+RAM);
-			}
-			else if((int)stackAddress==NONE){
-				page_user[i] = run_pid;
-				stackAddress = (int *)((i*PAGE_SIZE)+RAM);
-			}
-		}
-		if(((int)codeAddress!=NONE)&&((int)stackAddress!=NONE)){
-			break;
-		}		
-	}
 
-	//cons_printf("Run_pid = %d\n", run_pid);
-	//cons_printf("Code Segment Address = %x\n", codeAddress);
-	//cons_printf("Stack Segment Address = %x\nAttemting code copy\n", stackAddress);
-	//cons_printf("Code Address = %x\n", code);
-	//Code Operations
-	//
-	//Bzero((char *)codeAddress, PAGE_SIZE);	
-	MemCpy((char *)codeAddress, (char *)code, PAGE_SIZE);	
-		*/
-	//cons_printf("Clearing stack\n");
-	//Stack Operations
 	Bzero((char *)pages[STACK_PAGE], PAGE_SIZE);
-	(char *)p = (char*)(pages[STACK_PAGE]+PAGE_SIZE);
+	p = (int *)(pages[STACK_PAGE]+PAGE_SIZE);
 	p--;
 
 	//cons_printf("Setting stackAddress to arg\n");
@@ -472,20 +447,20 @@ void ExecSR(int code, int arg){
 	//cons_printf("Temp TPAddress before --%x\n", pcb[run_pid].trapframe_p);
 	q--;
 	//cons_printf("Temp TPAddress %x\n", pcb[run_pid].trapframe_p);
-	pcb[run_pid].trapframe_p = q;
+
 	//cons_printf("Getting efl\n");
-	pcb[run_pid].trapframe_p->efl = EF_DEFAULT_VALUE|EF_INTR; // enables intr
+	q->efl = EF_DEFAULT_VALUE|EF_INTR; // enables intr
    	//cons_printf("Getting cs\n");
-	pcb[run_pid].trapframe_p->cs = get_cs();                  // dupl from CPU
+	q->cs = get_cs();                  // dupl from CPU
    	//cons_printf("Setting eip\n");
-	pcb[run_pid].trapframe_p->eip =  pages[CODE_PAGE];
+	q->eip =  M256;
 	//cons_printf("Trapframe EIP: %x\n", pcb[run_pid].trapframe_p->eip);
 	//cons_printf("End of Code\n");
 	
 	//pcb[run_pid].trapframe_p = (trapframe_t *)tempTP;
 
   Bzero((char *)pages[MAIN_TABLE], PAGE_SIZE);
-  MemCpy((char *)pages[MAIN_TABLE], (char *)kernel_main_table, (sizeof(int)*4));
+  MemCpy((char *)pages[MAIN_TABLE], (char *)kernel_main_table, (sizeof(int [4])));
   entry=M256>>22;
   ((int *)pages[MAIN_TABLE])[entry] = ((int)pages[CODE_TABLE] | PRESENT | RW);
   entry = G1_1>>22;
@@ -497,10 +472,11 @@ void ExecSR(int code, int arg){
 
   Bzero((char *)pages[STACK_TABLE], PAGE_SIZE);
   entry = (G1_1 & MASK10)>>12;
-  ((int *)pages[STACK_TABLE])[entry] = ((int)pages[CODE_PAGE] | PRESENT | RW);
+  ((int *)pages[STACK_TABLE])[entry] = ((int)pages[STACK_PAGE] | PRESENT | RW);
 
   pcb[run_pid].main_table = (int)pages[MAIN_TABLE];
   pcb[run_pid].trapframe_p = (trapframe_t *)V_TF;
+  cons_printf("End of Exec\n");
   
 }
 

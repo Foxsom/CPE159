@@ -1,7 +1,7 @@
 // main.c, 159
 // OS phase 1
 //
-// Team Name: gdb4life (Members: Tyler Fox, Zachary Derheim, Jesse Root)
+// Team Name: gdb4life (Members: Tyler Fox, Jesse Root)
 #include "k-include.h"  // SPEDE includes
 #include "k-entry.h"    // entries to kernel (TimerEntry, etc.)
 #include "k-type.h"     // kernel data types
@@ -210,7 +210,7 @@ void Kernel(trapframe_t *trapframe_p) {           // kernel runs
       else if (ch=='n') {
 	if(nPressed==0){
 		rand = sys_centi_sec;
-		cons_printf("Rand = %d\n", rand);
+		//cons_printf("Rand = %d\n", rand);
 		nPressed=1;
 	}
 	NewProcSR(UserProc);                     // 'n' for new process
