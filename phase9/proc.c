@@ -76,7 +76,8 @@ void UserProc(void) {
    int my_pid = GetPidCall();
    int forkPid;
    int exitCode;
-   char childPIDPrint[] = "Child PID:     ";
+   char childPIDPrint[] = "Child PID: ";
+   //char forkPidStr[] = "  ";
    //char exitCodeStr[] = "Exit Code: ";
    //char exitCodeStrConv[STR_SIZE];  
    //char str1[STR_SIZE] = "PID    process is running exclusively using the video display...";
@@ -127,7 +128,7 @@ void UserProc(void) {
 
 	for(i = 0; i<5; i++){
 		forkPid = ForkCall();
-	
+    //cons_printf("Child PID: %d\n", forkPid);	
 		//cons_printf("Done with Fork\n");
 		if(forkPid==NONE){
 			WriteCall(which_term, "Couldn't fork!\0");
@@ -141,8 +142,9 @@ void UserProc(void) {
 		//childPIDPrint[11] = (forkPid/10)+'0';
 		//childPIDPrint[12] = (forkPid%10)+'0';
 		Itoa(&childPIDPrint[11],forkPid);
-    Itoa(&childPIDPrint[12],forkPid);
+    //Itoa(&childPIDPrint[12],forkPid);
     WriteCall(which_term, childPIDPrint);
+    
 		WriteCall(which_term, "\n\r");
 	}
 
@@ -154,7 +156,7 @@ void UserProc(void) {
 	for(i = 0; i<5; i++){
     //KillCall(0, SIGGO);
 		exitCode = WaitCall();
-		Itoa(&arriveStr1[11], exitCode);
+		Itoa(&arriveStr1[16], exitCode);
 		WriteCall(which_term, arriveStr1);
     WriteCall(which_term, " ");
     arriveStr2[0] = exitCode/100+'A';

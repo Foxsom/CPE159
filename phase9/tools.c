@@ -90,14 +90,15 @@ int StrCmp(char *str1, char *str2){
 void Itoa(char *str, int x){
 	int i = x;
 	int j;
-	int index=0;
+	int index=5;
+  int start = 10000;
 	
 
 	//cons_printf("Itoa Input is %d\n", x);
 	
 	if(x>100000){
 		return;
-	}
+	}/*
 	while(i != 0){
 		i = i/10;
 		index++;
@@ -109,4 +110,22 @@ void Itoa(char *str, int x){
 	}
 	*(str+index) = '\0';
   return;
+  */
+  
+  //str[0] = ((x/10000)%10)+'0';
+  //str[1] = ((x/1000)%10)+'0';
+  //str[2] = ((x/100)%10)+'0';
+  //str[3] = ((x/10)%10)+'0';
+  //str[4] = (x%10)+'0';
+  
+  while ((x/start)==0){
+    start=start/10;
+    index--;
+  }
+
+  for(i=0; i<index;i++){
+    str[i] = ((x/start)%10)+'0';
+    start = start/10;
+    }
+    str[index] = '\0';
 }

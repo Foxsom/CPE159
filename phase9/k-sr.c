@@ -364,7 +364,7 @@ void ExitSR(int exit_code){
 }
 	//Phase 7 FOX
 void ExecSR(int code, int arg){
-  int i, j, pages[5], *p, entry;
+  int i, pages[5], *p, entry;
   trapframe_t *q;
   enum {MAIN_TABLE, CODE_TABLE, STACK_TABLE, CODE_PAGE, STACK_PAGE};
 
@@ -377,34 +377,34 @@ void ExecSR(int code, int arg){
         if(pages[MAIN_TABLE]==NONE){
             pages[MAIN_TABLE] = (i*PAGE_SIZE)+RAM;
             page_user[i] = run_pid;
-            cons_printf("MAIN TABLE: %x\n", pages[MAIN_TABLE]);
+//            cons_printf("MAIN TABLE: %x\n", pages[MAIN_TABLE]);
           }
 
         else if(pages[CODE_TABLE] == NONE){
             pages[CODE_TABLE] = (i*PAGE_SIZE)+RAM;
             page_user[i] = run_pid;
-            cons_printf("CODE TABLE: %x\n", pages[CODE_TABLE]);
+  //          cons_printf("CODE TABLE: %x\n", pages[CODE_TABLE]);
 
           }
 
         else if(pages[STACK_TABLE] == NONE){
             pages[STACK_TABLE] = (i*PAGE_SIZE)+RAM;
             page_user[i] = run_pid;
-            cons_printf("STACK TABLE: %x\n", pages[STACK_TABLE]);
+//            cons_printf("STACK TABLE: %x\n", pages[STACK_TABLE]);
 
           }  
 
         else if(pages[CODE_PAGE] == NONE){
             pages[CODE_PAGE] = (i*PAGE_SIZE)+RAM;
             page_user[i] = run_pid;
-            cons_printf("CODE PAGE: %x\n", pages[CODE_PAGE]);
+  //          cons_printf("CODE PAGE: %x\n", pages[CODE_PAGE]);
 
           }
 
         else if(pages[STACK_PAGE] == NONE){
             pages[STACK_PAGE] = (i*PAGE_SIZE)+RAM;
             page_user[i] = run_pid;
-            cons_printf("STACK PAGE: %x\n", pages[STACK_PAGE]);
+    //        cons_printf("STACK PAGE: %x\n", pages[STACK_PAGE]);
 
           }
 
@@ -458,25 +458,35 @@ void ExecSR(int code, int arg){
 	//cons_printf("End of Code\n");
 	
 	//pcb[run_pid].trapframe_p = (trapframe_t *)tempTP;
-
+  
+  //MAIN TABLE
   Bzero((char *)pages[MAIN_TABLE], PAGE_SIZE);
+  
   MemCpy((char *)pages[MAIN_TABLE], (char *)kernel_main_table, (sizeof(int [4])));
+  
+  
   entry=M256>>22;
   ((int *)pages[MAIN_TABLE])[entry] = ((int)pages[CODE_TABLE] | PRESENT | RW);
+  
   entry = G1_1>>22;
   ((int *)pages[MAIN_TABLE])[entry] = ((int)pages[STACK_TABLE] | PRESENT | RW);
-
+  
+  
+  //CODE TABLE
   Bzero((char *)pages[CODE_TABLE], PAGE_SIZE);
+  
   entry = (M256 & MASK10)>>12;
   ((int *)pages[CODE_TABLE])[entry] = ((int)pages[CODE_PAGE] | PRESENT | RW);
-
+  
+  //STACK TABLE
   Bzero((char *)pages[STACK_TABLE], PAGE_SIZE);
+  
   entry = (G1_1 & MASK10)>>12;
   ((int *)pages[STACK_TABLE])[entry] = ((int)pages[STACK_PAGE] | PRESENT | RW);
 
   pcb[run_pid].main_table = (int)pages[MAIN_TABLE];
   pcb[run_pid].trapframe_p = (trapframe_t *)V_TF;
-  cons_printf("End of Exec\n");
+  //cons_printf("End of Exec\n");
   
 }
 
